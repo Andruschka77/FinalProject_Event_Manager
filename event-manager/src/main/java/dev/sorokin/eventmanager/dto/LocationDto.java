@@ -1,8 +1,9 @@
 package dev.sorokin.eventmanager.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,16 +16,18 @@ public class LocationDto {
     private final Long id;
 
     @NotBlank
+    @Size(min = 3, max = 20)
     private final String name;
 
     @NotBlank
+    @Size(min = 3, max = 60)
     private final String address;
 
     @NotNull
     @PositiveOrZero
     private final Integer capacity;
 
-    @NotBlank
+    @Size(min = 5)
     private final String description;
 
 }

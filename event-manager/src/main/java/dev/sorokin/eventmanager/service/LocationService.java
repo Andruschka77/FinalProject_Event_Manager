@@ -43,7 +43,7 @@ public class LocationService {
                 .ofSize(pageSize)
                 .withPage(pageNumber);
 
-        return locationRepository.searchBooks(pageable)
+        return locationRepository.findAll(pageable)
                 .stream()
                 .map(entityConverter::toDomain)
                 .toList();
@@ -61,21 +61,17 @@ public class LocationService {
             Long locationId,
             Location locationToUpdate
     ) {
-        if (!locationRepository.existsById(locationId)) {
-            throw new ResourceNotFoundException("Location", locationId);
-        }
+        var updatedLocation = locationRepository.findById(locationId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Location", locationId)
+                );
 
-        locationRepository.updateLocation(
-                locationId,
-                locationToUpdate.getName(),
-                locationToUpdate.getAddress(),
-                locationToUpdate.getCapacity(),
-                locationToUpdate.getDescription()
-        );
+        updatedLocation.setName(locationToUpdate.getName());
+        updatedLocation.setAddress(locationToUpdate.getAddress());
+        updatedLocation.setCapacity(locationToUpdate.getCapacity());
+        updatedLocation.setDescription(locationToUpdate.getDescription());
 
-        return entityConverter.toDomain(
-                locationRepository.findById(locationId).orElseThrow()
-        );
+        return entityConverter.toDomain(updatedLocation);
     }
 
     public void deleteLocation(Long locationId) {
