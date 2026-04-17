@@ -1,7 +1,7 @@
 package dev.sorokin.eventmanager.service;
 
 import dev.sorokin.eventmanager.exception.ResourceNotFoundException;
-import dev.sorokin.eventmanager.mapper.LocationEntityConverter;
+import dev.sorokin.eventmanager.mapper.LocationEntityMapper;
 import dev.sorokin.eventmanager.model.domain.Location;
 import dev.sorokin.eventmanager.repository.LocationRepository;
 import org.springframework.stereotype.Service;
@@ -13,14 +13,14 @@ import java.util.List;
 public class LocationService {
 
     private final LocationRepository locationRepository;
-    private final LocationEntityConverter entityConverter;
+    private final LocationEntityMapper entityMapper;
 
     public LocationService(
             LocationRepository locationRepository,
-            LocationEntityConverter entityConverter
+            LocationEntityMapper entityMapper
     ) {
         this.locationRepository = locationRepository;
-        this.entityConverter = entityConverter;
+        this.entityMapper = entityMapper;
     }
 
     public Location createLocation(Location locationToCreate) {
@@ -28,9 +28,9 @@ public class LocationService {
             throw new IllegalArgumentException("Location name already taken");
         }
 
-        var locationToSave = entityConverter.toEntity(locationToCreate);
+        var locationToSave = entityMapper.toEntity(locationToCreate);
 
-        return entityConverter.toDomain(
+        return entityMapper.toDomain(
                 locationRepository.save(locationToSave)
         );
     }
@@ -45,7 +45,7 @@ public class LocationService {
 
         return locationRepository.findAll(pageable)
                 .stream()
-                .map(entityConverter::toDomain)
+                .map(entityMapper::toDomain)
                 .toList();
     }
 
@@ -53,7 +53,7 @@ public class LocationService {
         var foundLocation = locationRepository.findById(locationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Location", locationId));
 
-        return entityConverter.toDomain(foundLocation);
+        return entityMapper.toDomain(foundLocation);
     }
 
     @Transactional
@@ -71,7 +71,7 @@ public class LocationService {
         updatedLocation.setCapacity(locationToUpdate.getCapacity());
         updatedLocation.setDescription(locationToUpdate.getDescription());
 
-        return entityConverter.toDomain(updatedLocation);
+        return entityMapper.toDomain(updatedLocation);
     }
 
     public void deleteLocation(Long locationId) {

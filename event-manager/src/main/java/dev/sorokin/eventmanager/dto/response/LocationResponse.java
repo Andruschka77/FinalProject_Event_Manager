@@ -1,4 +1,4 @@
-package dev.sorokin.eventmanager.dto;
+package dev.sorokin.eventmanager.dto.response;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LocationDto {
+public class LocationResponse {
 
     @Null
     private final Long id;

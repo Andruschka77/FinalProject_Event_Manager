@@ -1,7 +1,7 @@
 package dev.sorokin.eventmanager.config;
 
 import dev.sorokin.eventmanager.exception.ResourceNotFoundException;
-import dev.sorokin.eventmanager.model.response.ErrorMessageResponse;
+import dev.sorokin.eventmanager.dto.response.ErrorMessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

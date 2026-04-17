@@ -5,7 +5,7 @@ import dev.sorokin.eventmanager.model.entity.LocationEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocationEntityConverter {
+public class LocationEntityMapper {
 
     public Location toDomain(LocationEntity location) {
         return new Location(

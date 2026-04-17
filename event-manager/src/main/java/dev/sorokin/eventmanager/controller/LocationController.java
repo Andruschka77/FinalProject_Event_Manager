@@ -1,7 +1,7 @@
 package dev.sorokin.eventmanager.controller;
 
-import dev.sorokin.eventmanager.dto.LocationDto;
-import dev.sorokin.eventmanager.mapper.LocationDtoConverter;
+import dev.sorokin.eventmanager.dto.response.LocationResponse;
+import dev.sorokin.eventmanager.mapper.LocationDtoMapper;
 import dev.sorokin.eventmanager.model.domain.Location;
 import dev.sorokin.eventmanager.service.LocationService;
 import jakarta.validation.Valid;
@@ -21,41 +21,41 @@ public class LocationController {
     private static final Logger log = LoggerFactory.getLogger(LocationController.class);
 
     private final LocationService locationService;
-    private final LocationDtoConverter dtoConverter;
+    private final LocationDtoMapper dtoMapper;
 
     public LocationController(
             LocationService locationService,
-            LocationDtoConverter dtoConverter
+            LocationDtoMapper dtoMapper
     ) {
         this.locationService = locationService;
-        this.dtoConverter = dtoConverter;
+        this.dtoMapper = dtoMapper;
     }
 
     @PostMapping
-    public ResponseEntity<LocationDto> createLocation(
-            @RequestBody @Valid LocationDto locationToCreate
+    public ResponseEntity<LocationResponse> createLocation(
+            @RequestBody @Valid LocationResponse locationToCreate
     ) {
         log.info("Get request for create location: location={}", locationToCreate);
 
         Location createdLocation = locationService.createLocation(
-                dtoConverter.toDomain(locationToCreate)
+                dtoMapper.toDomain(locationToCreate)
         );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(dtoConverter.toDto(createdLocation));
+                .body(dtoMapper.toDto(createdLocation));
     }
 
     @GetMapping
-    public ResponseEntity<List<LocationDto>> getAllLocations(
+    public ResponseEntity<List<LocationResponse>> getAllLocations(
             @RequestParam(name = "pageNum", defaultValue = "0") @Min(0) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = "2") @Min(2) @Max(20) Integer pageSize
     ) {
         log.info("Get request for getAllLocations");
 
-        List<LocationDto> locations = locationService.searchLocations(pageNumber, pageSize)
+        List<LocationResponse> locations = locationService.searchLocations(pageNumber, pageSize)
                 .stream()
-                .map(dtoConverter::toDto)
+                .map(dtoMapper::toDto)
                 .toList();
 
         return ResponseEntity
@@ -65,7 +65,7 @@ public class LocationController {
     }
 
     @GetMapping("/{locationId}")
-    public ResponseEntity<LocationDto> findLocationById(
+    public ResponseEntity<LocationResponse> findLocationById(
             @PathVariable("locationId") Long locationId
     ) {
         log.info("Get request for find location by id: locationId={}", locationId);
@@ -73,24 +73,24 @@ public class LocationController {
         var foundLocation = locationService.findById(locationId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(dtoConverter.toDto(foundLocation));
+                .body(dtoMapper.toDto(foundLocation));
     }
 
     @PutMapping("/{locationId}")
-    public ResponseEntity<LocationDto> updateLocation(
+    public ResponseEntity<LocationResponse> updateLocation(
             @PathVariable("locationId") Long locationId,
-            @RequestBody @Valid LocationDto locationToUpdate
+            @RequestBody @Valid LocationResponse locationToUpdate
     ) {
         log.info("Get request for update location: locationId={}, locationToUpdate={}", locationId, locationToUpdate);
 
         var updatedLocation = locationService.updateLocation(
                 locationId,
-                dtoConverter.toDomain(locationToUpdate)
+                dtoMapper.toDomain(locationToUpdate)
         );
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(dtoConverter.toDto(updatedLocation));
+                .body(dtoMapper.toDto(updatedLocation));
     }
 
     @DeleteMapping("/{locationId}")
