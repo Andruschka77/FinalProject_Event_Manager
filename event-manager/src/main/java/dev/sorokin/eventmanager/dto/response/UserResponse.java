@@ -1,4 +1,11 @@
 package dev.sorokin.eventmanager.dto.response;
 
-public class UserResponse {
+import dev.sorokin.eventmanager.model.enums.UserRole;
+
+public record UserResponse(
+        Long id,
+        String login,
+        Integer age,
+        UserRole role
+) {
 }

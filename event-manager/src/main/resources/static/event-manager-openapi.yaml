@@ -5,20 +5,20 @@ info:
   title: Event Management Service
   version: 1.0.0
 servers:
-- url: http://localhost:8080
+  - url: http://localhost:8080
 security:
-- bearerAuth: []
+  - bearerAuth: []
 tags:
-- name: Auth
-  description: Registration and authentication with JWT access tokens
-- name: Users
-  description: User management endpoints
-- name: Locations
-  description: Location CRUD and capacity constraints
-- name: Events
-  description: Event CRUD, search and ownership rules
-- name: Registrations
-  description: User registration and cancellation for events
+  - name: Auth
+    description: Registration and authentication with JWT access tokens
+  - name: Users
+    description: User management endpoints
+  - name: Locations
+    description: Location CRUD and capacity constraints
+  - name: Events
+    description: Event CRUD, search and ownership rules
+  - name: Registrations
+    description: User registration and cancellation for events
 paths:
   "/locations":
     get:

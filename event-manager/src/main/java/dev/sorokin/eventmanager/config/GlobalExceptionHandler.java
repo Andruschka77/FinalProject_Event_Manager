@@ -43,6 +43,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        log.error("Got exception", ex);
+
         var errorDto = new ErrorMessageResponse(
                 "Сущность не найдена",
                 ex.getMessage(),
