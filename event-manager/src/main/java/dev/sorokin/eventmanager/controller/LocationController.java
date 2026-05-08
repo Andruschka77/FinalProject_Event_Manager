@@ -1,7 +1,7 @@
 package dev.sorokin.eventmanager.controller;
 
 import dev.sorokin.eventmanager.dto.LocationDto;
-import dev.sorokin.eventmanager.mapper.LocationDtoConverter;
+import dev.sorokin.eventmanager.mapper.LocationDtoMapper;
 import dev.sorokin.eventmanager.model.domain.Location;
 import dev.sorokin.eventmanager.service.LocationService;
 import jakarta.validation.Valid;
@@ -21,14 +21,14 @@ public class LocationController {
     private static final Logger log = LoggerFactory.getLogger(LocationController.class);
 
     private final LocationService locationService;
-    private final LocationDtoConverter dtoConverter;
+    private final LocationDtoMapper dtoMapper;
 
     public LocationController(
             LocationService locationService,
-            LocationDtoConverter dtoConverter
+            LocationDtoMapper dtoMapper
     ) {
         this.locationService = locationService;
-        this.dtoConverter = dtoConverter;
+        this.dtoMapper = dtoMapper;
     }
 
     @PostMapping
@@ -38,12 +38,12 @@ public class LocationController {
         log.info("Get request for create location: location={}", locationToCreate);
 
         Location createdLocation = locationService.createLocation(
-                dtoConverter.toDomain(locationToCreate)
+                dtoMapper.toDomain(locationToCreate)
         );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(dtoConverter.toDto(createdLocation));
+                .body(dtoMapper.toDto(createdLocation));
     }
 
     @GetMapping
@@ -55,7 +55,7 @@ public class LocationController {
 
         List<LocationDto> locations = locationService.searchLocations(pageNumber, pageSize)
                 .stream()
-                .map(dtoConverter::toDto)
+                .map(dtoMapper::toDto)
                 .toList();
 
         return ResponseEntity
@@ -73,7 +73,7 @@ public class LocationController {
         var foundLocation = locationService.findById(locationId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(dtoConverter.toDto(foundLocation));
+                .body(dtoMapper.toDto(foundLocation));
     }
 
     @PutMapping("/{locationId}")
@@ -85,19 +85,19 @@ public class LocationController {
 
         var updatedLocation = locationService.updateLocation(
                 locationId,
-                dtoConverter.toDomain(locationToUpdate)
+                dtoMapper.toDomain(locationToUpdate)
         );
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(dtoConverter.toDto(updatedLocation));
+                .body(dtoMapper.toDto(updatedLocation));
     }
 
     @DeleteMapping("/{locationId}")
     public ResponseEntity<Void> deleteLocation(
             @PathVariable("locationId") Long locationId
     ) {
-        log.info("Delete request for delete location by id: locationId={}", locationId);
+        log.info("Get request for delete location by id: locationId={}", locationId);
 
         locationService.deleteLocation(locationId);
 

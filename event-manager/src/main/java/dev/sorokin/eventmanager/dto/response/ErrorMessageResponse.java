@@ -1,4 +1,4 @@
-package dev.sorokin.eventmanager.model.response;
+package dev.sorokin.eventmanager.dto.response;
 
 import java.time.LocalDateTime;
 

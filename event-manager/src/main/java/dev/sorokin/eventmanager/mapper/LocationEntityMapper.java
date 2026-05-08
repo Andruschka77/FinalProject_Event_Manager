@@ -1,13 +1,13 @@
 package dev.sorokin.eventmanager.mapper;
 
-import dev.sorokin.eventmanager.dto.LocationDto;
 import dev.sorokin.eventmanager.model.domain.Location;
+import dev.sorokin.eventmanager.model.entity.LocationEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocationDtoConverter {
+public class LocationEntityMapper {
 
-    public Location toDomain(LocationDto location) {
+    public Location toDomain(LocationEntity location) {
         return new Location(
                 location.getId(),
                 location.getName(),
@@ -17,9 +17,8 @@ public class LocationDtoConverter {
         );
     }
 
-    public LocationDto toDto(Location location) {
-        return new LocationDto(
-                location.getId(),
+    public LocationEntity toEntity(Location location) {
+        return new LocationEntity(
                 location.getName(),
                 location.getAddress(),
                 location.getCapacity(),

@@ -12,22 +12,22 @@ import lombok.Data;
 @AllArgsConstructor
 public class LocationDto {
 
-    @Null
-    private final Long id;
+        @Null
+        private final Long id;
 
-    @NotBlank
-    @Size(min = 3, max = 20)
-    private final String name;
+        @NotBlank
+        @Size(min = 3, max = 20)
+        private final String name;
 
-    @NotBlank
-    @Size(min = 3, max = 60)
-    private final String address;
+        @NotBlank
+        @Size(min = 3, max = 60)
+        private final String address;
 
-    @NotNull
-    @PositiveOrZero
-    private final Integer capacity;
+        @NotNull
+        @PositiveOrZero
+        private final Integer capacity;
 
-    @Size(min = 5)
-    private final String description;
+        @Size(min = 5)
+        private final String description;
 
 }

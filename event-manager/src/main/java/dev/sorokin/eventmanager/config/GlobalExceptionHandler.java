@@ -1,11 +1,12 @@
 package dev.sorokin.eventmanager.config;
 
 import dev.sorokin.eventmanager.exception.ResourceNotFoundException;
-import dev.sorokin.eventmanager.model.response.ErrorMessageResponse;
+import dev.sorokin.eventmanager.dto.response.ErrorMessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,15 +43,34 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorMessageResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+    public ResponseEntity<ErrorMessageResponse> handleResourceNotFoundException(ResourceNotFoundException e) {
+        log.error("Got exception", e);
+
         var errorDto = new ErrorMessageResponse(
                 "Сущность не найдена",
-                ex.getMessage(),
+                e.getMessage(),
                 LocalDateTime.now()
         );
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(errorDto);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorMessageResponse> handleBadCredentials(
+            BadCredentialsException e
+    ) {
+        log.error("Bad credentials", e);
+
+        var errorDto = new ErrorMessageResponse(
+                "Неверный логин или пароль",
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(errorDto);
     }
 
