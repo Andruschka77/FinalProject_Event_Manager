@@ -14,17 +14,16 @@ public class UserEntityMapper {
                 user.getId(),
                 user.getLogin(),
                 user.getAge(),
-                UserRole.valueOf(user.getRole())
+                user.getRole()
         );
     }
 
     public UserEntity toEntity(UserRegistrationRequest user, String hashedPass) {
         return new UserEntity(
-                null,
                 user.login(),
                 user.age(),
                 hashedPass,
-                UserRole.USER.name()
+                UserRole.USER
         );
     }
 

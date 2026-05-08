@@ -45,11 +45,10 @@ public class UserService {
 
     public void createAdmin(String login, Integer age, String password) {
         UserEntity admin = new UserEntity(
-                null,
                 login,
                 age,
                 password,
-                UserRole.ADMIN.name()
+                UserRole.ADMIN
         );
         userRepository.save(admin);
     }

@@ -1,13 +1,13 @@
 package dev.sorokin.eventmanager.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "locations")
 public class LocationEntity {
@@ -27,5 +27,17 @@ public class LocationEntity {
 
     @Column(nullable = false)
     private String description;
+
+    public LocationEntity(
+            String name,
+            String address,
+            Integer capacity,
+            String description
+    ) {
+        this.name = name;
+        this.address = address;
+        this.capacity = capacity;
+        this.description = description;
+    }
 
 }

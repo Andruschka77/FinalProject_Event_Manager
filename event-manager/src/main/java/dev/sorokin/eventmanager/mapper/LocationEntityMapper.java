@@ -19,7 +19,6 @@ public class LocationEntityMapper {
 
     public LocationEntity toEntity(Location location) {
         return new LocationEntity(
-                location.getId(),
                 location.getName(),
                 location.getAddress(),
                 location.getCapacity(),

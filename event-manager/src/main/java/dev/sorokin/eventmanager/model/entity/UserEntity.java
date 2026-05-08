@@ -1,13 +1,14 @@
 package dev.sorokin.eventmanager.model.entity;
 
+import dev.sorokin.eventmanager.model.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "users")
 public class UserEntity {
@@ -25,7 +26,20 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role;
+    private UserRole role;
+
+    public UserEntity(
+            String login,
+            Integer age,
+            String password,
+            UserRole role
+    ) {
+        this.login = login;
+        this.age = age;
+        this.password = password;
+        this.role = role;
+    }
 
 }
