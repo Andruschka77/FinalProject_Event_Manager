@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0005-create-registrations-table
+      author: Andruschka77
+      changes:
+        - createTable:
+            tableName: registrations_events
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: event_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_registrations_event
+            baseTableName: registrations_events
+            baseColumnNames: event_id
+            referencedTableName: events
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_registrations_user
+            baseTableName: registrations_events
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id

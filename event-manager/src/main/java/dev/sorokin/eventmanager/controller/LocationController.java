@@ -1,6 +1,7 @@
 package dev.sorokin.eventmanager.controller;
 
-import dev.sorokin.eventmanager.dto.LocationDto;
+import dev.sorokin.eventmanager.dto.request.LocationRequest;
+import dev.sorokin.eventmanager.dto.response.LocationResponse;
 import dev.sorokin.eventmanager.mapper.LocationDtoMapper;
 import dev.sorokin.eventmanager.model.domain.Location;
 import dev.sorokin.eventmanager.service.LocationService;
@@ -32,8 +33,8 @@ public class LocationController {
     }
 
     @PostMapping
-    public ResponseEntity<LocationDto> createLocation(
-            @RequestBody @Valid LocationDto locationToCreate
+    public ResponseEntity<LocationResponse> createLocation(
+            @RequestBody @Valid LocationRequest locationToCreate
     ) {
         log.info("Get request for create location: location={}", locationToCreate);
 
@@ -47,13 +48,13 @@ public class LocationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LocationDto>> getAllLocations(
+    public ResponseEntity<List<LocationResponse>> getAllLocations(
             @RequestParam(name = "pageNum", defaultValue = "0") @Min(0) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = "2") @Min(2) @Max(20) Integer pageSize
     ) {
         log.info("Get request for getAllLocations");
 
-        List<LocationDto> locations = locationService.searchLocations(pageNumber, pageSize)
+        List<LocationResponse> locations = locationService.searchLocations(pageNumber, pageSize)
                 .stream()
                 .map(dtoMapper::toDto)
                 .toList();
@@ -61,11 +62,10 @@ public class LocationController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(locations);
-
     }
 
     @GetMapping("/{locationId}")
-    public ResponseEntity<LocationDto> findLocationById(
+    public ResponseEntity<LocationResponse> findLocationById(
             @PathVariable("locationId") Long locationId
     ) {
         log.info("Get request for find location by id: locationId={}", locationId);
@@ -77,9 +77,9 @@ public class LocationController {
     }
 
     @PutMapping("/{locationId}")
-    public ResponseEntity<LocationDto> updateLocation(
+    public ResponseEntity<LocationResponse> updateLocation(
             @PathVariable("locationId") Long locationId,
-            @RequestBody @Valid LocationDto locationToUpdate
+            @RequestBody @Valid LocationRequest locationToUpdate
     ) {
         log.info("Get request for update location: locationId={}, locationToUpdate={}", locationId, locationToUpdate);
 

@@ -62,6 +62,10 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/locations/**").hasAnyAuthority("USER", "ADMIN")
                                 .requestMatchers("/locations/**").hasAuthority("ADMIN")
 
+                                .requestMatchers(HttpMethod.POST, "/events").hasAuthority("USER")
+                                .requestMatchers("/events/my", "/events/registrations/**").hasAuthority("USER")
+                                .requestMatchers("/events/**").hasAnyAuthority("USER", "ADMIN")
+
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception ->

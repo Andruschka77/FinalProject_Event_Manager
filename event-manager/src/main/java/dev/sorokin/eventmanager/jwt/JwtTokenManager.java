@@ -1,6 +1,5 @@
 package dev.sorokin.eventmanager.jwt;
 
-import dev.sorokin.eventmanager.model.domain.User;
 import dev.sorokin.eventmanager.model.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

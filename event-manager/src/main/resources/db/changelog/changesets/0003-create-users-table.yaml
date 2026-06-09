@@ -1,36 +1,36 @@
 databaseChangeLog:
   - changeSet:
       id: 0003-create-users-table
-      author: course-team
+      author: Andruschka77
       changes:
         - createTable:
             tableName: users
             columns:
               - column:
                   name: id
-                  type: bigint
+                  type: BIGINT
                   autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: login
-                  type: varchar(255)
+                  type: VARCHAR(255)
                   constraints:
                     nullable: false
                     unique: true
               - column:
                   name: age
-                  type: int
+                  type: INT
                   constraints:
                     nullable: false
               - column:
                   name: password
-                  type: varchar(255)
+                  type: VARCHAR(255)
                   constraints:
                     nullable: false
               - column:
                   name: role
-                  type: varchar(50)
+                  type: VARCHAR(50)
                   constraints:
                     nullable: false
