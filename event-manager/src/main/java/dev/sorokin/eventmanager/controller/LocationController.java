@@ -8,8 +8,7 @@ import dev.sorokin.eventmanager.service.LocationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +16,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/locations")
+@Slf4j
 public class LocationController {
-
-    private static final Logger log = LoggerFactory.getLogger(LocationController.class);
 
     private final LocationService locationService;
     private final LocationDtoMapper dtoMapper;

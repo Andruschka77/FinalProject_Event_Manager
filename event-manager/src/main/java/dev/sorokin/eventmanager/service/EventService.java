@@ -12,7 +12,9 @@ import dev.sorokin.eventmanager.model.enums.EventStatus;
 import dev.sorokin.eventmanager.model.enums.UserRole;
 import dev.sorokin.eventmanager.repository.EventRepository;
 import dev.sorokin.eventmanager.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 public class EventService {
 
     private final EventEntityMapper eventEntityMapper;
@@ -155,6 +158,26 @@ public class EventService {
                 .stream()
                 .map(eventEntityMapper::toDomain)
                 .toList();
+    }
+
+    @Scheduled(cron = "${event.status.cron}")
+    @Transactional
+    public void updateStatuses() {
+        // WAIT_START -> STARTED
+        int started = eventRepository.changeWaitStartToStarted(
+                EventStatus.WAIT_START,
+                EventStatus.STARTED,
+                LocalDateTime.now()
+        );
+
+        // STARTED -> FINISHED
+        int finished = eventRepository.changeStartedToFinished(
+                EventStatus.STARTED.name(),
+                EventStatus.FINISHED.name(),
+                LocalDateTime.now()
+        );
+
+        log.info("Updated statuses: {} events started, {} events finished", started, finished);
     }
 
 }

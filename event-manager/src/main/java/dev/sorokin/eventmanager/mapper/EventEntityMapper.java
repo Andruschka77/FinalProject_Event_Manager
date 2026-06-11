@@ -37,7 +37,7 @@ public class EventEntityMapper {
                 event.getCostTickets(),
                 event.getDurationMinutes(),
                 event.getMaxPlaces(),
-                0,
+                event.getOccupiedPlaces(),
                 event.getStatus()
         );
     }
