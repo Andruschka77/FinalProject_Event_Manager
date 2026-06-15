@@ -33,3 +33,7 @@ springdoc:
   swagger-ui:
     path: /index.html
     url: /event-manager-openapi.yaml
+
+event:
+  status:
+    cron: "0 */5 * * * *"

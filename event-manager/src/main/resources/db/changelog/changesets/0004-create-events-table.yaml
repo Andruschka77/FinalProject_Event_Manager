@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0004-create-events-table
+      author: Andruschka77
+      changes:
+        - createTable:
+            tableName: events
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cost_tickets
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: duration_minutes
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: max_places
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: occupied_places
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_events_location
+            baseTableName: events
+            baseColumnNames: location_id
+            referencedTableName: locations
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_events_owner
+            baseTableName: events
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,6 +27,12 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private List<RegistrationEntity> registrations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner")
+    private List<EventEntity> ownedEvents = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

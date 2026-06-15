@@ -29,6 +29,24 @@ paths:
         - Итерация 1: добавить endpoint для получения списка локаций.
         - Итерация 2: endpoint теперь вызывается только с Bearer JWT; доступ разрешен ролям ADMIN и USER.
         - Итерация 5: изменена внутренняя логика чтения; используется cache-aside для списка локаций с Redis.
+      parameters:
+        - name: pageNum
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+            minimum: 0
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 2
+            maximum: 20
+            minimum: 2
       responses:
         '200':
           content:
@@ -869,6 +887,24 @@ paths:
 
         Изменения по итерациям:
         - Итерация 3: endpoint добавлен.
+      parameters:
+        - name: pageNum
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+            minimum: 0
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 2
+            maximum: 20
+            minimum: 2
       requestBody:
         content:
           application/json:
@@ -935,6 +971,24 @@ paths:
 
         Изменения по итерациям:
         - Итерация 3: endpoint добавлен.
+      parameters:
+        - name: pageNum
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+            minimum: 0
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 2
+            maximum: 20
+            minimum: 2
       responses:
         '200':
           content:
@@ -1139,6 +1193,24 @@ paths:
 
         Изменения по итерациям:
         - Итерация 3: endpoint добавлен.
+      parameters:
+        - name: pageNum
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+            minimum: 0
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 2
+            maximum: 20
+            minimum: 2
       responses:
         '200':
           content:
