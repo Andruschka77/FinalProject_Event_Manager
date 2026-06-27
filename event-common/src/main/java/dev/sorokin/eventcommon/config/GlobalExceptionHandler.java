@@ -1,24 +1,21 @@
-package dev.sorokin.eventmanager.config;
+package dev.sorokin.eventcommon.config;
 
-import dev.sorokin.eventmanager.exception.ResourceNotFoundException;
-import dev.sorokin.eventmanager.dto.response.ErrorMessageResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.sorokin.eventcommon.exception.ResourceNotFoundException;
+import dev.sorokin.eventcommon.dto.ErrorMessageResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
-
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,

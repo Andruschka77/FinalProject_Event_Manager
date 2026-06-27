@@ -1,8 +1,5 @@
-package dev.sorokin.eventmanager.jwt;
+package dev.sorokin.eventnotificator.jwt;
 
-import dev.sorokin.eventcommon.exception.ResourceNotFoundException;
-import dev.sorokin.eventmanager.mapper.UserEntityMapper;
-import dev.sorokin.eventmanager.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,17 +19,9 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenManager jwtTokenManager;
-    private final UserRepository userRepository;
-    private final UserEntityMapper userEntityMapper;
 
-    public JwtTokenFilter(
-            JwtTokenManager jwtTokenManager,
-            UserRepository userRepository,
-            UserEntityMapper userEntityMapper
-    ) {
+    public JwtTokenFilter(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
-        this.userRepository = userRepository;
-        this.userEntityMapper = userEntityMapper;
     }
 
     @Override
@@ -49,17 +38,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         var jwtToken = authorizationHeader.substring(7);
 
-        String loginFromToken;
+        Long userIdFromToken;
         try {
-            loginFromToken = jwtTokenManager.getLoginFromToken(jwtToken);
+            userIdFromToken = jwtTokenManager.getUserIdFromToken(jwtToken);
         } catch (Exception e) {
             log.error("Error while reading jwt", e);
             filterChain.doFilter(request, response);
             return;
         }
-
-        var userEntity = userRepository.findByLogin(loginFromToken)
-                .orElseThrow(() -> new ResourceNotFoundException("User", loginFromToken));
 
         var authorities = List.of(
                 new SimpleGrantedAuthority(
@@ -68,7 +54,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         );
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                userEntityMapper.toDomain(userEntity),
+                userIdFromToken,
                 null,
                 authorities
         );

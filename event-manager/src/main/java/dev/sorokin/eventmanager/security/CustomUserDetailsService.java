@@ -1,4 +1,4 @@
-package dev.sorokin.eventmanager.config;
+package dev.sorokin.eventmanager.security;
 
 import dev.sorokin.eventmanager.model.entity.UserEntity;
 import dev.sorokin.eventmanager.repository.UserRepository;

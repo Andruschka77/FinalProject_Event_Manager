@@ -1,6 +1,9 @@
 package dev.sorokin.eventmanager.config;
 
 import dev.sorokin.eventmanager.jwt.JwtTokenFilter;
+import dev.sorokin.eventcommon.security.CustomAccessDeniedHandler;
+import dev.sorokin.eventcommon.security.CustomAuthenticationEntryPoint;
+import dev.sorokin.eventmanager.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

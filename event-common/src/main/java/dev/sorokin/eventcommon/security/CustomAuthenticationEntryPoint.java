@@ -1,47 +1,45 @@
-package dev.sorokin.eventmanager.config;
+package dev.sorokin.eventcommon.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.sorokin.eventmanager.dto.response.ErrorMessageResponse;
-import org.springframework.security.access.AccessDeniedException;
+import dev.sorokin.eventcommon.dto.ErrorMessageResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomAccessDeniedHandler implements AccessDeniedHandler {
-
-    private static final Logger log = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
+@Slf4j
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
-    public CustomAccessDeniedHandler(ObjectMapper objectMapper) {
+    public CustomAuthenticationEntryPoint(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public void handle(
+    public void commence(
             HttpServletRequest request,
             HttpServletResponse response,
-            AccessDeniedException accessDeniedException
+            AuthenticationException authException
     ) throws IOException {
-        log.error("Handling access denied exception", accessDeniedException);
+        log.error("Handling authentication exception", authException);
         var messageResponse = new ErrorMessageResponse(
-                "Forbidden",
-                accessDeniedException.getMessage(),
+                "Failed to authenticate",
+                authException.getMessage(),
                 LocalDateTime.now()
         );
 
         var stringResponse = objectMapper.writeValueAsString(messageResponse);
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpStatus.FORBIDDEN.value());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(stringResponse);
     }
 

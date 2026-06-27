@@ -1,16 +1,21 @@
 package dev.sorokin.eventmanager.service;
 
+import dev.sorokin.eventcommon.kafka.ChangeItem;
+import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
 import dev.sorokin.eventmanager.dto.request.EventSearchRequest;
-import dev.sorokin.eventmanager.exception.ResourceNotFoundException;
+import dev.sorokin.eventcommon.exception.ResourceNotFoundException;
+import dev.sorokin.eventmanager.kafka.KafkaEventSender;
 import dev.sorokin.eventmanager.mapper.EventEntityMapper;
 import dev.sorokin.eventmanager.mapper.LocationEntityMapper;
 import dev.sorokin.eventmanager.model.domain.Event;
 import dev.sorokin.eventmanager.model.domain.Location;
 import dev.sorokin.eventmanager.model.domain.User;
+import dev.sorokin.eventmanager.model.entity.EventEntity;
 import dev.sorokin.eventmanager.model.entity.LocationEntity;
 import dev.sorokin.eventmanager.model.enums.EventStatus;
 import dev.sorokin.eventmanager.model.enums.UserRole;
 import dev.sorokin.eventmanager.repository.EventRepository;
+import dev.sorokin.eventmanager.repository.RegistrationRepository;
 import dev.sorokin.eventmanager.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +24,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -30,19 +38,25 @@ public class EventService {
     private final UserRepository userRepository;
     private final LocationService locationService;
     private final LocationEntityMapper locationEntityMapper;
+    private final RegistrationRepository registrationRepository;
+    private final KafkaEventSender kafkaEventSender;
 
     public EventService(
             EventEntityMapper eventEntityMapper,
             EventRepository eventRepository,
             UserRepository userRepository,
             LocationService locationService,
-            LocationEntityMapper locationEntityMapper
+            LocationEntityMapper locationEntityMapper,
+            RegistrationRepository registrationRepository,
+            KafkaEventSender kafkaEventSender
     ) {
         this.eventEntityMapper = eventEntityMapper;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.locationService = locationService;
         this.locationEntityMapper = locationEntityMapper;
+        this.registrationRepository = registrationRepository;
+        this.kafkaEventSender = kafkaEventSender;
     }
 
     public Event createEvent(Event eventToCreate) {
@@ -76,27 +90,84 @@ public class EventService {
         if (user.getRole() == UserRole.USER && !user.getId().equals(eventToUpdate.getOwnerId())) {
             throw new AccessDeniedException("У вас недостаточно прав для выполнения данной операции");
         }
-        var updatedEvent = eventRepository.findById(eventId)
+        var updatedEvent = eventRepository.findByIdWithOwner(eventId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Event", eventId)
                 );
 
         Location location = locationService.findById(eventToUpdate.getLocationId());
-        LocationEntity locationEntity = locationEntityMapper.toEntity(location);
-        locationEntity.setId(eventToUpdate.getLocationId());
+        List<ChangeItem> changes = new ArrayList<>();
 
-        if (locationEntity.getCapacity() < eventToUpdate.getMaxPlaces()) {
+        if (location.getCapacity() < eventToUpdate.getMaxPlaces()) {
             throw new IllegalArgumentException("Вместимость локации не позволяет провести мероприятие");
         }
 
-        updatedEvent.setName(eventToUpdate.getName());
-        updatedEvent.setLocation(locationEntity);
-        updatedEvent.setStartAt(eventToUpdate.getStartAt());
-        updatedEvent.setCostTickets(eventToUpdate.getCostTickets());
-        updatedEvent.setDurationMinutes(eventToUpdate.getDurationMinutes());
-        updatedEvent.setMaxPlaces(eventToUpdate.getMaxPlaces());
-        updatedEvent.setOccupiedPlaces(eventToUpdate.getOccupiedPlaces());
-        updatedEvent.setStatus(eventToUpdate.getStatus());
+        if (!Objects.equals(eventToUpdate.getName(), updatedEvent.getName())) {
+            changes.add(new ChangeItem(
+                    "name",
+                    updatedEvent.getName(),
+                    eventToUpdate.getName()
+            ));
+            updatedEvent.setName(eventToUpdate.getName());
+        }
+
+        if (!Objects.equals(updatedEvent.getLocation().getId(), eventToUpdate.getLocationId())) {
+            LocationEntity locationEntity = locationEntityMapper.toEntity(location);
+            locationEntity.setId(eventToUpdate.getLocationId());
+            changes.add(new ChangeItem(
+                    "locationId",
+                    updatedEvent.getLocation().getId(),
+                    eventToUpdate.getLocationId()
+            ));
+            updatedEvent.setLocation(locationEntity);
+        }
+
+        if (!Objects.equals(updatedEvent.getStartAt(), eventToUpdate.getStartAt())) {
+            changes.add(new ChangeItem(
+                    "date",
+                    updatedEvent.getStartAt(),
+                    eventToUpdate.getStartAt()
+            ));
+            updatedEvent.setStartAt(eventToUpdate.getStartAt());
+        }
+
+        if (!Objects.equals(updatedEvent.getCostTickets(), eventToUpdate.getCostTickets())) {
+            changes.add(new ChangeItem(
+                    "cost",
+                    updatedEvent.getCostTickets(),
+                    eventToUpdate.getCostTickets()
+            ));
+            updatedEvent.setCostTickets(eventToUpdate.getCostTickets());
+        }
+
+        if (!Objects.equals(updatedEvent.getDurationMinutes(), eventToUpdate.getDurationMinutes())) {
+            changes.add(new ChangeItem(
+                    "duration",
+                    updatedEvent.getDurationMinutes(),
+                    eventToUpdate.getDurationMinutes()
+            ));
+            updatedEvent.setDurationMinutes(eventToUpdate.getDurationMinutes());
+        }
+
+        if (!Objects.equals(updatedEvent.getMaxPlaces(), eventToUpdate.getMaxPlaces())) {
+            changes.add(new ChangeItem(
+                    "maxPlaces",
+                    updatedEvent.getMaxPlaces(),
+                    eventToUpdate.getMaxPlaces()
+            ));
+            updatedEvent.setMaxPlaces(eventToUpdate.getMaxPlaces());
+        }
+
+        kafkaEventSender.sendEvent(new EventChangeKafkaMessage(
+                UUID.randomUUID(),
+                "EVENT_UPDATED",
+                eventId,
+                LocalDateTime.now(),
+                updatedEvent.getOwner().getId(),
+                user.getId(),
+                registrationRepository.findSubscriberIdsByEventId(eventId),
+                changes
+        ));
 
         return eventEntityMapper.toDomain(updatedEvent);
     }
@@ -113,6 +184,23 @@ public class EventService {
         if (deletedEvent.getStartAt().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Нельзя удалить мероприятие, которое уже началось");
         }
+
+        List<ChangeItem> changes = List.of(new ChangeItem(
+                "status",
+                deletedEvent.getStatus(),
+                EventStatus.CANCELLED
+        ));
+
+        kafkaEventSender.sendEvent(new EventChangeKafkaMessage(
+                UUID.randomUUID(),
+                "EVENT_UPDATED",
+                eventId,
+                LocalDateTime.now(),
+                deletedEvent.getOwner().getId(),
+                currentUser.getId(),
+                registrationRepository.findSubscriberIdsByEventId(eventId),
+                changes
+        ));
 
         deletedEvent.setStatus(EventStatus.CANCELLED);
     }
@@ -164,20 +252,45 @@ public class EventService {
     @Transactional
     public void updateStatuses() {
         // WAIT_START -> STARTED
-        int started = eventRepository.changeWaitStartToStarted(
-                EventStatus.WAIT_START,
-                EventStatus.STARTED,
-                LocalDateTime.now()
-        );
+        List<EventEntity> eventsToStart = eventRepository.findEventsToStart(EventStatus.WAIT_START, LocalDateTime.now());
+        for (EventEntity event : eventsToStart) {
+            event.setStatus(EventStatus.STARTED);
+            publishStatusChangeEvent(
+                    event,
+                    EventStatus.WAIT_START,
+                    EventStatus.STARTED
+            );
+        }
 
         // STARTED -> FINISHED
-        int finished = eventRepository.changeStartedToFinished(
-                EventStatus.STARTED.name(),
-                EventStatus.FINISHED.name(),
-                LocalDateTime.now()
+        List<EventEntity> eventsToFinish = eventRepository.findEventsToFinish(EventStatus.STARTED.name(), LocalDateTime.now());
+        for (EventEntity event : eventsToFinish) {
+            event.setStatus(EventStatus.FINISHED);
+            publishStatusChangeEvent(
+                    event,
+                    EventStatus.STARTED,
+                    EventStatus.FINISHED
+            );
+        }
+
+        log.info("Updated statuses: {} events started, {} events finished", eventsToStart.size(), eventsToFinish.size());
+    }
+
+    private void publishStatusChangeEvent(EventEntity event, EventStatus oldStatus, EventStatus newStatus) {
+        List<ChangeItem> changes = List.of(
+                new ChangeItem("status", oldStatus.name(), newStatus.name())
         );
 
-        log.info("Updated statuses: {} events started, {} events finished", started, finished);
+        kafkaEventSender.sendEvent(new EventChangeKafkaMessage(
+                UUID.randomUUID(),
+                "EVENT_UPDATED",
+                event.getId(),
+                LocalDateTime.now(),
+                event.getOwner().getId(),
+                null,
+                registrationRepository.findSubscriberIdsByEventId(event.getId()),
+                changes
+        ));
     }
 
 }
