@@ -11,6 +11,7 @@ public record EventChangeKafkaMessage(
         LocalDateTime occurredAt,
         Long ownerId,
         Long changedById,
+        String eventName,
         List<Long> subscribers,
         List<ChangeItem> changes
 ) {

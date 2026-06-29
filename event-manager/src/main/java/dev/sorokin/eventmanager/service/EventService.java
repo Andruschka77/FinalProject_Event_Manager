@@ -1,5 +1,6 @@
 package dev.sorokin.eventmanager.service;
 
+import dev.sorokin.eventcommon.exception.AccessDeniedException;
 import dev.sorokin.eventcommon.kafka.ChangeItem;
 import dev.sorokin.eventcommon.kafka.EventChangeKafkaMessage;
 import dev.sorokin.eventmanager.dto.request.EventSearchRequest;
@@ -20,7 +21,6 @@ import dev.sorokin.eventmanager.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -165,6 +165,7 @@ public class EventService {
                 LocalDateTime.now(),
                 updatedEvent.getOwner().getId(),
                 user.getId(),
+                updatedEvent.getName(),
                 registrationRepository.findSubscriberIdsByEventId(eventId),
                 changes
         ));
@@ -193,11 +194,12 @@ public class EventService {
 
         kafkaEventSender.sendEvent(new EventChangeKafkaMessage(
                 UUID.randomUUID(),
-                "EVENT_UPDATED",
+                "EVENT_DELETED",
                 eventId,
                 LocalDateTime.now(),
                 deletedEvent.getOwner().getId(),
                 currentUser.getId(),
+                deletedEvent.getName(),
                 registrationRepository.findSubscriberIdsByEventId(eventId),
                 changes
         ));
@@ -288,6 +290,7 @@ public class EventService {
                 LocalDateTime.now(),
                 event.getOwner().getId(),
                 null,
+                event.getName(),
                 registrationRepository.findSubscriberIdsByEventId(event.getId()),
                 changes
         ));

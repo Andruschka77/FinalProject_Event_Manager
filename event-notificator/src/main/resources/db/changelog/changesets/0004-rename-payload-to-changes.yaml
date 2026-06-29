@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0004-rename-payload-to-changes
+      author: Andruschka77
+      changes:
+        - renameColumn:
+            tableName: notification_event_payloads
+            oldColumnName: payload
+            newColumnName: changes
+            columnDataType: jsonb

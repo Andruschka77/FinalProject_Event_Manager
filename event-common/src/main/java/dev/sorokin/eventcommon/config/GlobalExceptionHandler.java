@@ -1,5 +1,6 @@
 package dev.sorokin.eventcommon.config;
 
+import dev.sorokin.eventcommon.exception.AccessDeniedException;
 import dev.sorokin.eventcommon.exception.ResourceNotFoundException;
 import dev.sorokin.eventcommon.dto.ErrorMessageResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +10,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 

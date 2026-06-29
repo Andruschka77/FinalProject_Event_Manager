@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,8 +38,12 @@ public class NotificationEventPayloadEntity {
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
-    @Column(name = "payload", columnDefinition = "jsonb", nullable = false)
-    private String payload;
+    @Column(name = "event_name", nullable = false)
+    private String eventName;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "changes", columnDefinition = "jsonb", nullable = false)
+    private String changes;
 
     public NotificationEventPayloadEntity(
             String messageId,
@@ -46,7 +52,8 @@ public class NotificationEventPayloadEntity {
             LocalDateTime occurredAt,
             Long changedById,
             Long ownerId,
-            String payload
+            String eventName,
+            String changes
     ) {
         this.messageId = messageId;
         this.eventType = eventType;
@@ -54,7 +61,8 @@ public class NotificationEventPayloadEntity {
         this.occurredAt = occurredAt;
         this.changedById = changedById;
         this.ownerId = ownerId;
-        this.payload = payload;
+        this.eventName = eventName;
+        this.changes = changes;
     }
 
 }
