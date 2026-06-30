@@ -158,17 +158,19 @@ public class EventService {
             updatedEvent.setMaxPlaces(eventToUpdate.getMaxPlaces());
         }
 
-        kafkaEventSender.sendEvent(new EventChangeKafkaMessage(
-                UUID.randomUUID(),
-                "EVENT_UPDATED",
-                eventId,
-                LocalDateTime.now(),
-                updatedEvent.getOwner().getId(),
-                user.getId(),
-                updatedEvent.getName(),
-                registrationRepository.findSubscriberIdsByEventId(eventId),
-                changes
-        ));
+        if (!changes.isEmpty()) {
+            kafkaEventSender.sendEvent(new EventChangeKafkaMessage(
+                    UUID.randomUUID(),
+                    "EVENT_UPDATED",
+                    eventId,
+                    LocalDateTime.now(),
+                    updatedEvent.getOwner().getId(),
+                    user.getId(),
+                    updatedEvent.getName(),
+                    registrationRepository.findSubscriberIdsByEventId(eventId),
+                    changes
+            ));
+        }
 
         return eventEntityMapper.toDomain(updatedEvent);
     }
