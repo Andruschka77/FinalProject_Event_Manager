@@ -1,7 +1,7 @@
 package dev.sorokin.eventmanager.service;
 
 import dev.sorokin.eventmanager.dto.request.UserRegistrationRequest;
-import dev.sorokin.eventmanager.exception.ResourceNotFoundException;
+import dev.sorokin.eventcommon.exception.ResourceNotFoundException;
 import dev.sorokin.eventmanager.mapper.UserEntityMapper;
 import dev.sorokin.eventmanager.model.domain.User;
 import dev.sorokin.eventmanager.model.entity.UserEntity;

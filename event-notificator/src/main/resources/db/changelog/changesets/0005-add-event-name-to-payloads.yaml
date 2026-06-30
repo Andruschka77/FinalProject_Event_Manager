@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0005-add-event-name-to-payloads
+      author: Andruschka77
+      changes:
+        - addColumn:
+            tableName: notification_event_payloads
+            columns:
+              - column:
+                  name: event_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false

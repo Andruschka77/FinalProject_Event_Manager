@@ -8,9 +8,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
+
+    @EntityGraph(attributePaths = {"owner"})
+    @Query("SELECT e FROM EventEntity e WHERE e.id = :eventId")
+    Optional<EventEntity> findByIdWithOwner(@Param("eventId") Long eventId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT e FROM EventEntity e WHERE e.id = :eventId")
@@ -58,28 +63,24 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
     """)
     Page<EventEntity> findEventsByUserId(@Param("userId") Long userId, Pageable pageable);
 
-    @Modifying
+    @EntityGraph(attributePaths = {"owner"})
     @Query("""
-        UPDATE EventEntity e
-        SET e.status = :newStatus
-        WHERE e.status = :oldStatus AND e.startAt <= :timeNow
+    SELECT e FROM EventEntity e
+    WHERE e.status = :oldStatus
+        AND e.startAt <= :timeNow
     """)
-    int changeWaitStartToStarted(
+    List<EventEntity> findEventsToStart(
             @Param("oldStatus") EventStatus oldStatus,
-            @Param("newStatus") EventStatus newStatus,
             @Param("timeNow") LocalDateTime time
     );
 
-    @Modifying
     @Query(value = """
-        UPDATE events
-        SET status = :newStatus
-        WHERE status = :oldStatus
-            AND start_at + (duration_minutes || ' minutes')::interval <= :timeNow
-    """, nativeQuery = true)
-    int changeStartedToFinished(
+    SELECT * FROM events
+    WHERE status = :oldStatus
+        AND start_at + (duration_minutes || ' minutes')::interval <= :timeNow
+   """, nativeQuery = true)
+    List<EventEntity> findEventsToFinish(
             @Param("oldStatus") String oldStatus,
-            @Param("newStatus") String newStatus,
             @Param("timeNow") LocalDateTime time
     );
 

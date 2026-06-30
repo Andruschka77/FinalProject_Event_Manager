@@ -1,0 +1,44 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: event-notificator
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/event_notificator
+    username: postgres
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/changelog-master.yaml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notificator-group
+      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: "*"
+
+jwt:
+  secret-key: 9f3c8b2a1d4e7f6a5c8d0e2b9a4f6c7d1e8b3a5f0c9d2e6a7b4f8c1d5e
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+
+springdoc:
+  swagger-ui:
+    path: /index.html
+    url: /event-notificator-openapi.yaml

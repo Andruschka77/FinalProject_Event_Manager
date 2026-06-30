@@ -1,6 +1,6 @@
 package dev.sorokin.eventmanager.service;
 
-import dev.sorokin.eventmanager.exception.ResourceNotFoundException;
+import dev.sorokin.eventcommon.exception.ResourceNotFoundException;
 import dev.sorokin.eventmanager.mapper.EventEntityMapper;
 import dev.sorokin.eventmanager.model.domain.Event;
 import dev.sorokin.eventmanager.model.entity.RegistrationEntity;

@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changesets/0001-starter-baseline.yaml
+  - include:
+      file: db/changelog/changesets/0002-create-notification-event-payloads-table.yaml
+  - include:
+      file: db/changelog/changesets/0003-create-notifications-table.yaml
+  - include:
+      file: db/changelog/changesets/0004-rename-payload-to-changes.yaml
+  - include:
+      file: db/changelog/changesets/0005-add-event-name-to-payloads.yaml
